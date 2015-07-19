@@ -53,10 +53,12 @@ describe Configurizer do
         include Configurizer
 
         self.config_filename = '.testmod'
+        self.do_not_save "calc_var"
 
         class Configurizer::Configuration
           attr_accessor :value_a
           attr_accessor :value_b
+          attr_accessor :calc_var
         end
       end
     end
@@ -80,6 +82,30 @@ describe Configurizer do
         within_test_dir "save_config" do
           TestMod.save_configuration
           expect(Pathname(".testmod").exist?).to eq true
+        end
+      end
+
+      it 'does not include "do_not_save" vars' do
+        TestMod.configure do |config|
+          config.value_a = "Hello Z"
+          config.value_b = "Hello Y"
+          config.calc_var = "calculated"
+        end
+
+        within_test_dir "save_config" do
+          TestMod.save_configuration
+
+          TestMod.configure do |config|
+            config.value_a = nil
+            config.value_b = nil
+            config.calc_var = nil
+          end
+
+          TestMod.load_configuration
+
+          expect(TestMod.configuration.value_a).to eq "Hello Z"
+          expect(TestMod.configuration.value_b).to eq "Hello Y"
+          expect(TestMod.configuration.calc_var).to eq nil
         end
       end
 

@@ -32,11 +32,16 @@ module MyProject
   # Set the configuration filename (don't include a path)
   self.config_filename = '.myproject'
 
+  # Prevent specific config variables from being saved:
+  self.do_not_save "calc_var1", "calc_var2"
+
   # Open Configurizer::Configuration class and add member
   # variables, methods, etc.
   class Configurizer::Configuration
     attr_accessor :value_a
     attr_accessor :value_b
+    attr_accessor :calc_var1
+    attr_accessor :calc_var2
 
     attr_reader :some_other_val
     attr_writer :verbose

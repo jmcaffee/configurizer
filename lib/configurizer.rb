@@ -4,7 +4,50 @@ require 'yaml'
 
 module Configurizer
 
-  class Configuration; end
+  class Configuration
+
+    ##
+    # Add an instance variable to the list of non-emittable variables.
+    #
+    # args:: 1 or more variable names separated by commas
+    #
+    # Example:
+    #
+    #   do_not_save "var_a", "var_b", "var_c"
+    #
+
+    def self.do_not_save *args
+      self._no_emit_vars = self._no_emit_vars | args
+    end
+
+    ##
+    # Control which instance vars are emitted when dumped to YAML.
+    #
+
+    def encode_with(coder)
+      vars = instance_variables.map { |x| x.to_s }
+      no_emit = Configurizer::Configuration._no_emit_vars.reject { |x| x.nil? or x.empty? }
+      no_emit = no_emit | ["_no_emit_vars"]
+
+      vars = vars - no_emit.collect { |x| "@" + x }
+
+      vars.each do |var|
+        var_val = eval(var)
+        coder[var.gsub('@', '')] = var_val
+      end
+    end
+
+    private
+
+    def self._no_emit_vars
+      @_no_emit_vars ||= Array.new
+    end
+
+    def self._no_emit_vars= ary
+      @_no_emit_vars = Array(ary)
+    end
+
+  end
 
   def self.included(base)
     base.extend(ClassMethods)
@@ -26,6 +69,10 @@ module Configurizer
     def config_filename
       raise "config_filename not set!" if @cfg_filename.nil? or @cfg_filename.empty?
       @cfg_filename
+    end
+
+    def do_not_save *args
+      Configurizer::Configuration.do_not_save *args
     end
 
     ##
