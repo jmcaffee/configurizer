@@ -92,6 +92,16 @@ module MyProject
 end
 ```
 
+Be sure to save your configuration when finished.
+
+```ruby
+# Save configuration to current working dir
+MyProject.save_configuration
+
+# or save configuration to specific dir
+MyProject.save_configuration ENV["HOME"]
+```
+
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake rspec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
