@@ -40,6 +40,10 @@ describe Configurizer do
 
   context '.config_filename= and .config_filename' do
 
+    it 'raises ConfigurationError if filename not set' do
+      expect { TestMod.config_filename }.to raise_exception ConfigurationError
+    end
+
     it 'sets and retrieves the configuration filename' do
       TestMod.config_filename = '.testmod'
       expect(TestMod.config_filename).to eq '.testmod'

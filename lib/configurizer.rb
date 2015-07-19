@@ -2,6 +2,10 @@ require "configurizer/version"
 require "pathname"
 require 'yaml'
 
+class ConfigurationError < StandardError; end
+
+$debug = true if ENV["DEBUG"]
+
 module Configurizer
 
   ##
@@ -74,7 +78,7 @@ module Configurizer
     end
 
     def config_filename
-      raise "config_filename not set!" if @cfg_filename.nil? or @cfg_filename.empty?
+      raise ConfigurationError, "config_filename not set!" if @cfg_filename.nil? or @cfg_filename.empty?
       @cfg_filename
     end
 
@@ -150,6 +154,7 @@ module Configurizer
 
       path = Pathname(path).expand_path
       File.write(path, YAML.dump(configuration))
+      $stdout << "configuration saved to #{path}\n" if $debug
 
       path
     end
@@ -175,7 +180,7 @@ module Configurizer
 
       File.open(path, 'r') do |f|
         self.configuration = YAML.load(f)
-        puts "configuration loaded from #{path}" if $debug
+        $stdout << "configuration loaded from #{path}\n" if $debug
       end
 
       true
