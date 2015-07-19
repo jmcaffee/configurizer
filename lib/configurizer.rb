@@ -1,5 +1,6 @@
 require "configurizer/version"
 require "pathname"
+require 'yaml'
 
 module Configurizer
 
@@ -7,13 +8,12 @@ module Configurizer
 
   def self.included(base)
     base.extend(ClassMethods)
-
-    class << self
-      attr_accessor :configuration
-    end
   end
 
   module ClassMethods
+
+    attr_accessor :configuration
+
     ##
     # Set the configuration filename to use.
     #
@@ -29,7 +29,7 @@ module Configurizer
     end
 
     ##
-    # Setup portal_module configuration
+    # Setup a configuration
     #
     # Attempts to find and load a configuration file the first time
     # it's requested. If a config file cannot be found on in the current
@@ -103,6 +103,10 @@ module Configurizer
 
       return false if path.nil?
       return false unless Pathname(path).exist?
+
+      unless path.to_s.end_with?('/' + config_filename)
+        path = Pathname(path) + config_filename
+      end
 
       File.open(path, 'r') do |f|
         self.configuration = YAML.load(f)
