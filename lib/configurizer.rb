@@ -4,16 +4,23 @@ require 'yaml'
 
 module Configurizer
 
+  ##
+  # Configuration class is designed to be re-opened by the user
+  # to add instance variables and methods.
+  #
+  # Example:
+  #
+  #   class Configurizer::Configuration
+  #     attr_accessor :some_var
+  #     attr_accessor :another_var
+  #
+  #   end
+  #
+
   class Configuration
 
     ##
-    # Add an instance variable to the list of non-emittable variables.
-    #
-    # args:: 1 or more variable names separated by commas
-    #
-    # Example:
-    #
-    #   do_not_save "var_a", "var_b", "var_c"
+    # See Configurizer.do_not_save
     #
 
     def self.do_not_save *args
@@ -46,7 +53,6 @@ module Configurizer
     def self._no_emit_vars= ary
       @_no_emit_vars = Array(ary)
     end
-
   end
 
   def self.included(base)
@@ -62,6 +68,7 @@ module Configurizer
     #
     # The filename should not include any part of a path
     #
+
     def config_filename= filename
       @cfg_filename = filename
     end
@@ -70,6 +77,17 @@ module Configurizer
       raise "config_filename not set!" if @cfg_filename.nil? or @cfg_filename.empty?
       @cfg_filename
     end
+
+    ##
+    # Add an instance variable to the list of non-emittable variables.
+    # Delegates to Configuration class method
+    #
+    # args:: 1 or more variable names separated by commas
+    #
+    # Example:
+    #
+    #   do_not_save "var_a", "var_b", "var_c"
+    #
 
     def do_not_save *args
       Configurizer::Configuration.do_not_save *args
@@ -98,7 +116,7 @@ module Configurizer
 
     ##
     # Walk up the directory tree from current working dir (pwd) till a file
-    # named .portal_module is found
+    # named with string in `config_filename` is found.
     #
     # Returns file path if found, nil if not.
     #
